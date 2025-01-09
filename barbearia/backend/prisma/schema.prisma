@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model appointment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  serviceId Int
+  date      DateTime
+  status    String
+  service   service  @relation(fields: [serviceId], references: [id], map: "Appointment_serviceId_fkey")
+  user      user     @relation(fields: [userId], references: [id], map: "Appointment_userId_fkey")
+
+  @@index([serviceId], map: "Appointment_serviceId_fkey")
+  @@index([userId], map: "Appointment_userId_fkey")
+}
+
+model service {
+  id          Int           @id @default(autoincrement())
+  name        String
+  price       Float
+  appointment appointment[]
+}
+
+model user {
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique(map: "User_email_key")
+  password    String
+  role        String
+  keyAdm      String?      @default("")
+  appointment appointment[]
+}
