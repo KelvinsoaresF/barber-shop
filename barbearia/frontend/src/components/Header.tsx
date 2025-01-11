@@ -21,13 +21,14 @@ export default function Header({
 
   // useEffect para buscar os dados do usuário após a montagem do componente
   useEffect(() => {
+    if (typeof window !== "undefined"){
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
 
       if (token) {
         try {
           // Faça a requisição para obter os dados do usuário
-          const response = api.get("http://localhost:5000/api/users/user", {
+          const response = api.get("/users/user", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -38,6 +39,7 @@ export default function Header({
           setIsLoged(true); // Marca como logado
         } catch (error) {
           console.error("Erro ao buscar os dados do usuário:", error);
+          // console.error('Detalhes do erro:', error.response)
           setIsLoged(false); // Se houver erro, desloga o usuário
         }
       } else {
@@ -46,6 +48,7 @@ export default function Header({
     };
 
     fetchUserData();
+  }
   }, []); // O efeito executa uma vez, após a renderização inicial
 
   const handleLogout = () => {

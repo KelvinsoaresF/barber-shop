@@ -5,7 +5,7 @@ import { useState } from "react";
 import api from "@/utils/axios";
 import '@/app/globals.css'
 import Button from "@/components/Button";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 
 export default function Register() {

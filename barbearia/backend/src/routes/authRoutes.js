@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../models/prismaClient.js'; 
 import dotenv from 'dotenv';
+import cookie from 'cookie';
 
 dotenv.config(); 
 const router = express.Router();
@@ -100,28 +101,52 @@ router.post("/register", async (req, res) => {
 });
 
 // Função para Atualizar o Access Token
-router.post('/refresh', async (req, res) => {
-    const { refreshToken } = req.body;
+router.post("/refresh", async (req, res) => {
+    const { refreshToken } = req.cookies
 
     if (!refreshToken) {
         return res.status(401).json({ error: 'Refresh token é necessário' });
     }
 
     try {
+
+        const revokedToken = await prisma.RevokedTokens.findUnique({
+            where: { token: refreshToken }
+        })
+
+        if (revokedToken) {
+            return res.status(401).json({ error: 'Refresh token inválido' });
+        }
+
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
+        // Cria um novo access token
         const newAccessToken = jwt.sign(
             { userId: decoded.userId, role: decoded.role },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
+        const newRefreshToken = jwt.sign(
+            { userId: decoded.userId, role: decoded.role },
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.setHeader('Set-Cookie', cookie.serialize('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 7, // 7 dias
+            path: '/'
+        }));
+
         res.json({ token: newAccessToken });
     } catch (error) {
-        res.status(401).json({ error: 'Refresh token inválido' });
+        console.error('Erro ao verificar refresh token:', error);
+        res.status(401).json({ error: 'Refresh token inválido', details: error.message });
     }
 });
-
 export default router;
 
 

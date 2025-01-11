@@ -22,8 +22,8 @@ export const getUser = async (req, res) => {
         return res.json({
             name: user.name,
             role: user.role,
-            
         })
+        
     } catch (error) {
         console.error('Erro ao buscar usuario', error)
         return res.status(500).json({ message: 'Erro no servidor' })

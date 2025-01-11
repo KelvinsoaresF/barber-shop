@@ -24,6 +24,7 @@ model service {
   id          Int           @id @default(autoincrement())
   name        String
   price       Float
+  image       String?  
   appointment appointment[]
 }
 
@@ -35,4 +36,10 @@ model user {
   role        String
   keyAdm      String?      @default("")
   appointment appointment[]
+}
+
+model RevokedTokens {
+  id           Int      @id @default(autoincrement())
+  token        String   @unique
+  revokedAt    DateTime @default(now())
 }
