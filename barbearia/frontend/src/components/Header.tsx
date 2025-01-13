@@ -18,6 +18,34 @@ export default function Header({
   const router = useRouter();
   const [isLoged, setIsLoged] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const refreshToken = localStorage.getItem('refreshToken')
+   
+    if (!refreshToken) {
+        setLoading(false)
+        return
+    }
+
+    const refreshAccessToken = async () => {
+        try {
+           const response =  await api.post('/auth/refresh', {refreshToken}, {
+            withCredentials: true,
+           })
+
+           localStorage.setItem('accessToken', response.data.token);
+           console.log('Novo accessToken:', response.data.token);
+
+           setLoading(false)
+        } catch (error) {
+            console.error('Erro ao renovar o access token:', error);
+            setLoading(false); // Fim do carregamento mesmo em erro
+        }
+    }
+    refreshAccessToken();
+}, [])
+
 
   // useEffect para buscar os dados do usuário após a montagem do componente
   useEffect(() => {
@@ -28,14 +56,14 @@ export default function Header({
       if (token) {
         try {
           // Faça a requisição para obter os dados do usuário
-          const response = api.get("/users/user", {
+          const response = await api.get("/users/user", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
 
           // Atualize o estado com os dados do usuário
-          setUser((await response).data);
+          setUser(response.data);
           setIsLoged(true); // Marca como logado
         } catch (error) {
           console.error("Erro ao buscar os dados do usuário:", error);
