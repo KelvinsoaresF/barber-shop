@@ -9,7 +9,11 @@ export const addService = async (req, res) => {
         }
 
         const newService = await prisma.service.create({
-            data: { name, price: parseFloat(price), image}
+            data: { 
+                name, 
+                price: parseFloat(price), 
+                image: null
+            }
         })
 
         res.status(201).json({ message: 'Serviço criado com sucesso', service: newService})

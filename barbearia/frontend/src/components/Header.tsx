@@ -18,40 +18,54 @@ export default function Header({
   const router = useRouter();
   const [isLoged, setIsLoged] = useState(false);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const refreshToken = localStorage.getItem('refreshToken')
-   
-    if (!refreshToken) {
-        setLoading(false)
-        return
-    }
+    const init = async () => {
+      const refreshToken = localStorage.getItem("refreshToken");
+  
+      // if (!refreshToken) {
+      //   setLoading(false); 
+      //   return;
+      // }
+  
+      try {
+        
+        const response = await api.post(
+          "/auth/refresh",
+          { refreshToken },
+          { withCredentials: true }
+        );
+  
+        
+        localStorage.setItem("accessToken", response.data.token);
+        console.log("Novo accessToken:", response.data.token);
+  
+      
+        // setLoading(false);
+      } catch (error) {
+        console.error("Erro ao renovar o access token:", error);
+        // setLoading(false); 
+      }
+    };
+  
+    init(); 
+  }, []);
 
-    const refreshAccessToken = async () => {
-        try {
-           const response =  await api.post('/auth/refresh', {refreshToken}, {
-            withCredentials: true,
-           })
 
-           localStorage.setItem('accessToken', response.data.token);
-           console.log('Novo accessToken:', response.data.token);
-
-           setLoading(false)
-        } catch (error) {
-            console.error('Erro ao renovar o access token:', error);
-            setLoading(false); // Fim do carregamento mesmo em erro
-        }
-    }
-    refreshAccessToken();
-}, [])
-
-
-  // useEffect para buscar os dados do usuário após a montagem do componente
+  
   useEffect(() => {
     if (typeof window !== "undefined"){
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
+
+
+      if (!token) {
+        console.error("Token não encontrado");
+        setIsLoged(false);
+        // setLoading(false);
+        return;
+      }
 
       if (token) {
         try {
@@ -80,11 +94,14 @@ export default function Header({
   }, []); // O efeito executa uma vez, após a renderização inicial
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    setIsLoged(false);
-    setUser(null);
-    router.push("/"); // Redireciona após o logout
+   localStorage.clear()
+
+   setIsLoged(false)
+   setUser(null)
+   router.push('/')
+   setTimeout(() => {
+    window.location.reload()
+   }, 100)
   };
 
   return (
@@ -124,7 +141,7 @@ export default function Header({
           </div>
         )}
 
-        <div className="flex justify-start space-x-4">{children}</div>
+          { <div className="flex justify-start space-x-4">{children}</div>}
       </div>
 
       <div className="container mx-auto text-center">

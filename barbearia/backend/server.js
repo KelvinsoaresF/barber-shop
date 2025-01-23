@@ -3,9 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 // import bodyParser from 'body-parser';
-import authRoutes from './src/routes/authRoutes.js'; // Adicione a extensão .js
-import userRoutes from './src/routes/userRoutes.js'; // Adicione a extensão .js
-import serviceRoutes from './src/routes/serviceRoutes.js'; // Adicione a extensão .js
+import authRoutes from './src/routes/authRoutes.js'; 
+import userRoutes from './src/routes/userRoutes.js'; 
+import serviceRoutes from './src/routes/serviceRoutes.js'; 
 
 dotenv.config();
 
@@ -18,13 +18,13 @@ app.use(cookieParser());
 
 app.use(cors({
     origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Permitir apenas GET e POST
-    allowedHeaders: ['Content-Type', 'Authorization'], // Permitir certos cabeçalhos
-    credentials: true, // Permitir o envio de cookies
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+    credentials: true, 
   }));
   
 
-app.use(express.json()); // bodyParser() deve ser chamado com json(), urlencoded(), etc.
+app.use(express.json()); 
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes)
