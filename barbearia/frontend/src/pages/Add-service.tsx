@@ -3,6 +3,7 @@
 import '@/app/globals.css'
 import { useState } from "react";
 import api from "@/utils/axios";
+import { useRouter } from 'next/navigation';
 
 export default function AddService() {
     const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function AddService() {
         price: 0,
         image: null,
     })
+    const router = useRouter()
     const [previewImage, setPreviewImage] = useState('')
     const [success, setSuccess] = useState('')
     const [error, setError] = useState('')
@@ -63,6 +65,7 @@ export default function AddService() {
             setSuccess('Serviço criado com sucesso')
             setFormData({ name: '', price: 0, image: null })
             setPreviewImage('')
+            router.push('/MenageServices')
         } catch (err) {
             console.error('Erro no backend:', err.response)
             setError(err.response?.data?.error || 'Erro ao criar serviço')
@@ -113,7 +116,8 @@ return (
                 {previewImage && (
                     <div className='mt-2 border rounded-md overflow-hidden'>
                         <p className='font-medium mb-2'>Pré visualização</p>
-                        <img src={previewImage} 
+                        <img 
+                        src={previewImage} 
                         alt="Imagem do serviço" 
                         className='w-full mt-2 rounded-md bg-gray-300 mt-2' 
                         />
