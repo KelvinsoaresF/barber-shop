@@ -50,9 +50,9 @@ export default function AddService() {
         try {
 
             const data = new FormData()
-            data.append('name', formData.name)
-            data.append('price', formData.price)
-            data.append('image', formData.image)
+                data.append('name', formData.name)
+                data.append('price', formData.price)
+                data.append('image', formData.image)
 
 
             const res = await api.post('http://localhost:5000/api/service/services', data, {

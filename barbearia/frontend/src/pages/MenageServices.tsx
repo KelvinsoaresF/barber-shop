@@ -4,6 +4,8 @@ import '@/app/globals.css'
 import { useState, useEffect, } from "react"
 import { useRouter } from "next/navigation"
 import api from "@/utils/axios"
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 export default function MenageServices() {
     const [services, setServices] = useState([])
@@ -15,6 +17,7 @@ export default function MenageServices() {
         const fetchServices = async () => {
             try {
                 const res = await api.get('/service/services'); 
+                console.log('Serviços recebidos:', res.data);
                 setServices(res.data); // Atualiza o estado com os serviços recebidos
             } catch (error) {
                 console.error('Erro ao carregar serviços:', error.response?.data || error.message);
@@ -31,7 +34,7 @@ export default function MenageServices() {
 
     return (
         <main className="bg-gray-500 min-h-screen flex flex-col items-center justify-center p-4">
-            <h1>Gerenciar serviços</h1>
+            {/* <h1>Gerenciar serviços</h1> */}
             <button
                 onClick={handleNewService}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md mb-6 hover:bg-blue-700"            
@@ -46,7 +49,7 @@ export default function MenageServices() {
                         className='bg-white p-4 rounded-lg overflow-hidden shadow-md'
                     >
                         <img 
-                            src={service.image}
+                            src={`${service.image}`}
                             alt="Imagem do serviço" 
                             className='w-full h-48 object-cover'
                         />
@@ -54,6 +57,11 @@ export default function MenageServices() {
                         <div className='p-4'>
                             <h1 className='text-lg font-bold'>{service.name}</h1>
                             <p className='text-gray-800'>{service.price.toFixed(2)}</p>
+
+                            <div className=' flex justify-end mt-4 gap-4'>
+                                <button>{<MdDelete />}</button>
+                                <button>{<FaEdit />}</button>
+                            </div>
                         </div>
                     </div>
                 ))}

@@ -17,9 +17,11 @@ export const refreshAccessToken = async () => {
     }
 
     try {
-        const response = await api.post('auth/refresh', { refreshToken });
+        // Não é necessário passar o refresh token diretamente, pois ele será enviado via cookie
+        const response = await api.post('/auth/refresh');
         console.log("Novo token recebido:", response.data.token);
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('token', response.data.token); // Atualiza o access token
+        localStorage.setItem('refreshToken', response.data.refreshToken); // Atualiza o refresh token
     } catch (err) {
         console.error('Erro ao atualizar token', err);
         window.location.href = '/Login';
@@ -35,9 +37,16 @@ export const isTokenExpired = (token) => {
     try {
         const decodedToken = jwt.decode(token);
         console.log("Token decodificado:", decodedToken);
-        return decodedToken && Date.now() / 1000 > decodedToken.exp;
+
+        // Verifica se o decodedToken é válido antes de tentar acessar a expiração
+        if (!decodedToken || !decodedToken.exp) {
+            console.error('Token inválido ou sem data de expiração');
+            return false;
+        }
+
+        return Date.now() / 1000 > decodedToken.exp;
     } catch (error) {
         console.error("Erro ao decodificar o token:", error);
-        return false; // Se houver erro, retorna false
+        return false;
     }
 };

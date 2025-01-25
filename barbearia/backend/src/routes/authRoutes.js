@@ -102,25 +102,28 @@ router.post("/register", async (req, res) => {
 
 // Função para Atualizar o Access Token
 router.post("/refresh", async (req, res) => {
-    const { refreshToken } = req.cookies
+    const { refreshToken } = req.cookies; // Certifique-se de que o cookie está sendo recebido
 
     if (!refreshToken) {
         return res.status(401).json({ error: 'Refresh token é necessário' });
     }
 
     try {
+        console.log('Recebendo Refresh Token:', refreshToken);
 
+        // Verifica se o token foi revogado
         const revokedToken = await prisma.RevokedTokens.findUnique({
-            where: { token: refreshToken }
-        })
+            where: { token: refreshToken },
+        });
 
         if (revokedToken) {
             return res.status(401).json({ error: 'Refresh token inválido' });
         }
 
+        // Verifica se o Refresh Token é válido
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-        // Cria um novo access token
+        // Gera novos tokens
         const newAccessToken = jwt.sign(
             { userId: decoded.userId, role: decoded.role },
             process.env.JWT_SECRET,
@@ -133,13 +136,17 @@ router.post("/refresh", async (req, res) => {
             { expiresIn: '7d' }
         );
 
-        res.setHeader('Set-Cookie', cookie.serialize('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 60 * 60 * 24 * 7, // 7 dias
-            path: '/'
-        }));
+        // Define o novo refresh token como cookie
+        res.setHeader(
+            'Set-Cookie',
+            cookie.serialize('refreshToken', newRefreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 60 * 60 * 24 * 7, // 7 dias
+                path: '/',
+            })
+        );
 
         res.json({ token: newAccessToken });
     } catch (error) {
@@ -147,6 +154,7 @@ router.post("/refresh", async (req, res) => {
         res.status(401).json({ error: 'Refresh token inválido', details: error.message });
     }
 });
+
 export default router;
 
 

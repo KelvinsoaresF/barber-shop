@@ -37,7 +37,15 @@ export const addService = async (req, res) => {
 export const getServices = async (req, res) => {
     try {
         const services = await prisma.service.findMany();
-        res.status(200).json(services);
+
+        const updatedServices = services.map(service => {
+            // Verifica se a URL já contém o domínio
+            if (!service.image.startsWith('http')) {
+                service.image = `http://localhost:5000${service.image.replace(/\\/g, '/')}`;
+            }
+            return service;
+        });
+        res.status(200).json(updatedServices);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao buscar serviços', details: error })
     }

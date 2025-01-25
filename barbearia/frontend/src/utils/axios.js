@@ -16,8 +16,8 @@ api.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const refreshToken = localStorage.getItem('refreshToken');
-                const response = await api.post('/auth/refresh', { refreshToken });
+                // O refreshToken é automaticamente enviado com os cookies devido ao `withCredentials: true`
+                const response = await api.post('/auth/refresh'); // Não precisa enviar manualmente o refresh token
 
                 localStorage.setItem('token', response.data.token); // Atualiza o access token
                 localStorage.setItem('refreshToken', response.data.refreshToken); // Atualiza o refresh token
@@ -38,6 +38,7 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
 
 export default api;
 
