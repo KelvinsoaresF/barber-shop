@@ -23,7 +23,7 @@ export default function Main() {
 
         const refreshAccessToken = async () => {
             try {
-               const response =  await api.post('/auth/refresh', {refreshToken}, {
+               const response =  await api.post('http://localhost:5000/api/auth/refresh', {}, {
                 withCredentials: true,
                })
 

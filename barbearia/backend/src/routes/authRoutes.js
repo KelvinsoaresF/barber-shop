@@ -110,7 +110,7 @@ router.post("/refresh", async (req, res) => {
     try {
         console.log('Recebendo Refresh Token:', refreshToken);
 
-        // Verifica se o token foi revogado
+        // Verifica se o token já foi revogado no banco de dados
         const revokedToken = await prisma.RevokedTokens.findUnique({
             where: { token: refreshToken },
         });
@@ -122,6 +122,13 @@ router.post("/refresh", async (req, res) => {
         // Verifica se o Refresh Token é válido
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         console.log('Decoded Refresh Token:', decoded);  // Para verificar se o token é válido
+
+        // Salva o Refresh Token no banco de dados como revogado
+        await prisma.RevokedTokens.create({
+            data: {
+                token: refreshToken, // Salva o refresh token atual como revogado
+            }
+        });
 
         // Gera novos tokens
         const newAccessToken = jwt.sign(
@@ -148,7 +155,9 @@ router.post("/refresh", async (req, res) => {
             })
         );
 
+        // Envia o novo access token
         res.json({ token: newAccessToken });
+
     } catch (error) {
         console.error('Erro ao verificar refresh token:', error);
         res.status(401).json({ error: 'Refresh token inválido', details: error.message });
