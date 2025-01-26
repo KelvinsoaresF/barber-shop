@@ -1,3 +1,6 @@
+import '@/app/globals.css'
+
+
 export default function Services() {
     return (
         <section>

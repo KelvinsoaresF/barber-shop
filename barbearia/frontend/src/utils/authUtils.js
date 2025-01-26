@@ -7,12 +7,10 @@ export const refreshAccessToken = async () => {
         return;
     }
 
-    const refreshToken = localStorage.getItem('refreshToken');
-    console.log("Refresh Token:", refreshToken);
-
-    if (!refreshToken) {
-        console.log("Refresh token não encontrado. Redirecionando para Login...");
-        window.location.href = '/Login';
+    const accessToken = localStorage.getItem('token');
+    if (!accessToken) {
+        console.log("Access token não encontrado. Redirecionando para Login...");
+        // window.location.href = '/Login';
         return;
     }
 
@@ -20,11 +18,14 @@ export const refreshAccessToken = async () => {
         // Não é necessário passar o refresh token diretamente, pois ele será enviado via cookie
         const response = await api.post('/auth/refresh');
         console.log("Novo token recebido:", response.data.token);
-        localStorage.setItem('token', response.data.token); // Atualiza o access token
-        localStorage.setItem('refreshToken', response.data.refreshToken); // Atualiza o refresh token
+
+        // Atualiza o access token no localStorage
+        localStorage.setItem('token', response.data.token); 
     } catch (err) {
         console.error('Erro ao atualizar token', err);
-        window.location.href = '/Login';
+
+        // Caso falhe ao atualizar o token, redireciona para login
+        // window.location.href = '/Login';
     }
 };
 

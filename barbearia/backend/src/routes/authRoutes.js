@@ -51,7 +51,6 @@ router.post("/register", async (req, res) => {
 
     console.log("Dados recebidos:", { name, email, password, role, keyAdm });
 
-
     if (!name || !email || !password) {
         return res.status(401).json({ error: 'Todos os campos são obrigatórios' });
     }
@@ -65,7 +64,7 @@ router.post("/register", async (req, res) => {
             return res.status(400).json({ error: 'Usuário já em uso' });
         }
 
-        if (role === 'adm' && keyAdm !== process.env.ADMIN_KEY) {
+        if (role === 'admin' && keyAdm !== process.env.ADMIN_KEY) {
             return res.status(403).json({ error: 'Chave de acesso inválida!' });
         }
 
@@ -122,6 +121,7 @@ router.post("/refresh", async (req, res) => {
 
         // Verifica se o Refresh Token é válido
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        console.log('Decoded Refresh Token:', decoded);  // Para verificar se o token é válido
 
         // Gera novos tokens
         const newAccessToken = jwt.sign(
@@ -141,7 +141,7 @@ router.post("/refresh", async (req, res) => {
             'Set-Cookie',
             cookie.serialize('refreshToken', newRefreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure: process.env.NODE_ENV === 'production', // Certifique-se de usar 'https' em produção
                 sameSite: 'strict',
                 maxAge: 60 * 60 * 24 * 7, // 7 dias
                 path: '/',
@@ -156,5 +156,3 @@ router.post("/refresh", async (req, res) => {
 });
 
 export default router;
-
-

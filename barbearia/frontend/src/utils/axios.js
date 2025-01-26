@@ -19,8 +19,8 @@ api.interceptors.response.use(
                 // O refreshToken é automaticamente enviado com os cookies devido ao `withCredentials: true`
                 const response = await api.post('/auth/refresh'); // Não precisa enviar manualmente o refresh token
 
-                localStorage.setItem('token', response.data.token); // Atualiza o access token
-                localStorage.setItem('refreshToken', response.data.refreshToken); // Atualiza o refresh token
+                // Armazena o novo access token no localStorage
+                localStorage.setItem('token', response.data.token);
 
                 // Adiciona o novo token na requisição original
                 originalRequest.headers['Authorization'] = `Bearer ${response.data.token}`;
@@ -28,9 +28,13 @@ api.interceptors.response.use(
                 return axios(originalRequest); // Refaz a requisição original
             } catch (error) {
                 console.error('Erro ao renovar o token:', error);
+
+                // Limpa os tokens armazenados no localStorage
                 localStorage.removeItem('token');
                 localStorage.removeItem('refreshToken');
-                router.push('/login'); // Redireciona para login
+
+                // Redireciona para o login
+                window.location.href = '/login'; // Usando redirecionamento via window.location
                 return Promise.reject(error);
             }
         }
@@ -39,6 +43,6 @@ api.interceptors.response.use(
     }
 );
 
-
 export default api;
+
 
