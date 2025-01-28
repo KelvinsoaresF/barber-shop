@@ -13,31 +13,31 @@ export default function Main() {
     const [loading, setLoading] = useState(true);
 
 
-    useEffect(() => {
-        const refreshToken = localStorage.getItem('refreshToken')
+    // useEffect(() => {
+    //     const refreshToken = localStorage.getItem('refreshToken')
        
-        if (!refreshToken) {
-            setLoading(false)
-            return
-        }
+    //     if (!refreshToken) {
+    //         setLoading(false)
+    //         return
+    //     }
 
-        const refreshAccessToken = async () => {
-            try {
-               const response =  await api.post('http://localhost:5000/api/auth/refresh', {}, {
-                withCredentials: true,
-               })
+    //     const refreshAccessToken = async () => {
+    //         try {
+    //            const response =  await api.post('/auth/refresh', {}, {
+    //             withCredentials: true,
+    //            })
 
-               localStorage.setItem('accessToken', response.data.token);
-               console.log('Novo accessToken:', response.data.token);
+    //            localStorage.setItem('accessToken', response.data.token);
+    //            console.log('Novo accessToken:', response.data.token);
 
-               setLoading(false)
-            } catch (error) {
-                console.error('Erro ao renovar o access token:', error);
-                setLoading(false); // Fim do carregamento mesmo em erro
-            }
-        }
-        refreshAccessToken();
-    }, [])
+    //            setLoading(false)
+    //         } catch (error) {
+    //             console.error('Erro ao renovar o access token:', error);
+    //             setLoading(false); // Fim do carregamento mesmo em erro
+    //         }
+    //     }
+    //     refreshAccessToken();
+    // }, [])
 
     useEffect(() => {
 
@@ -61,6 +61,10 @@ export default function Main() {
         router.push('/MenageServices')
     }
 
+    const handleAppointment = () => {
+        router.push('/AppointmentList')
+    }
+
     return (
         <>
         <Header  title="Bem-vindo à Barbearia" 
@@ -82,6 +86,9 @@ export default function Main() {
                     {console.log("Admin detected")}  {/* Verificação para saber se o botão é renderizado */}
                     <button onClick={handleAdminClick} className="mt-4 text-white border-2 border-gray-300 rounded-full px-4 py-2">
                         Gerenciar serviços
+                    </button>
+                    <button onClick={handleAppointment} className="mt-4 text-white border-2 border-gray-300 rounded-full px-4 py-2">
+                        Agendamentos
                     </button>
                 </>
             )}

@@ -1,12 +1,58 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../models/prismaClient.js'; 
+import { prisma } from '../models/prismaClient.js';
 import dotenv from 'dotenv';
 import cookie from 'cookie';
+import cors from 'cors';
 
-dotenv.config(); 
+dotenv.config();
 const router = express.Router();
+
+// Configuração do CORS
+const corsOptions = {
+    origin: 'http://localhost:3000', // Substitua pelo URL correto do seu frontend
+    credentials: true,
+};
+router.use(cors(corsOptions));
+
+// Rota de Registro
+router.post('/register', async (req, res) => {
+    const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: 'Preencha todos os campos obrigatórios.' });
+    }
+
+    try {
+        // Verifica se o usuário já existe
+        const existingUser = await prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (existingUser) {
+            return res.status(400).json({ error: 'E-mail já cadastrado.' });
+        }
+
+        // Hash da senha
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Cria o novo usuário no banco de dados
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                role: role || 'cliente', // Define o papel padrão como 'cliente'
+            },
+        });
+
+        res.status(201).json({ message: 'Usuário registrado com sucesso!', userId: newUser.id });
+    } catch (error) {
+        console.error('Erro ao registrar usuário:', error);
+        res.status(500).json({ error: 'Erro interno do servidor ao registrar o usuário.' });
+    }
+});
 
 // Rota de Login
 router.post('/login', async (req, res) => {
@@ -27,110 +73,47 @@ router.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign(
-            { userId: user.id, role: user.role }, 
-            process.env.JWT_SECRET, 
+            { userId: user.id, role: user.role },
+            process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
         const refreshToken = jwt.sign(
-            { userId: user.id, role: user.role }, 
-            process.env.JWT_REFRESH_SECRET, 
+            { userId: user.id, role: user.role },
+            process.env.JWT_REFRESH_SECRET,
             { expiresIn: '30d' }
         );
 
-        res.json({ token, refreshToken, role: user.role });
+        // Configura o refreshToken no cookie
+        res.setHeader('Set-Cookie', cookie.serialize('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false, // Certifique-se de usar HTTPS em produção
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 30, // 30 dias
+            path: '/',
+        }));
+
+        res.status(200).json({
+            token,
+            role: user.role,
+            message: 'Login realizado com sucesso',
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao realizar login' });
     }
 });
 
-// Rota de Registro de Usuário
-router.post("/register", async (req, res) => {
-    const { name, email, password, role, keyAdm } = req.body;
-
-    console.log("Dados recebidos:", { name, email, password, role, keyAdm });
-
-    if (!name || !email || !password) {
-        return res.status(401).json({ error: 'Todos os campos são obrigatórios' });
-    }
-
-    try {
-        const existingUser = await prisma.user.findUnique({
-            where: { email }
-        });
-
-        if (existingUser) {
-            return res.status(400).json({ error: 'Usuário já em uso' });
-        }
-
-        if (role === 'admin' && keyAdm !== process.env.ADMIN_KEY) {
-            return res.status(403).json({ error: 'Chave de acesso inválida!' });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user = await prisma.user.create({
-            data: {
-                name,
-                email,
-                password: hashedPassword,
-                role,
-                keyAdm: keyAdm || null
-            }
-        });
-
-        const token = jwt.sign(
-            { userId: user.id, role: user.role }, 
-            process.env.JWT_SECRET, 
-            { expiresIn: '1h' }
-        );
-
-        const refreshToken = jwt.sign(
-            { userId: user.id, role: user.role }, 
-            process.env.JWT_REFRESH_SECRET, 
-            { expiresIn: '30d' }
-        );
-
-        res.status(201).json({ message: 'Usuário cadastrado com sucesso!', token, refreshToken });
-    } catch (error) {
-        console.error("Erro ao criar o usuário", error);
-        res.status(500).json({ error: 'Erro ao cadastrar usuário', details: error.message });
-    }
-});
-
-// Função para Atualizar o Access Token
-router.post("/refresh", async (req, res) => {
-    const { refreshToken } = req.cookies; // Certifique-se de que o cookie está sendo recebido
-
+// Rota para Atualizar o Access Token com o Refresh Token
+router.post('/refresh', (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
         return res.status(401).json({ error: 'Refresh token é necessário' });
     }
 
     try {
-        console.log('Recebendo Refresh Token:', refreshToken);
-
-        // Verifica se o token já foi revogado no banco de dados
-        const revokedToken = await prisma.RevokedTokens.findUnique({
-            where: { token: refreshToken },
-        });
-
-        if (revokedToken) {
-            return res.status(401).json({ error: 'Refresh token inválido' });
-        }
-
-        // Verifica se o Refresh Token é válido
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-        console.log('Decoded Refresh Token:', decoded);  // Para verificar se o token é válido
 
-        // Salva o Refresh Token no banco de dados como revogado
-        await prisma.RevokedTokens.create({
-            data: {
-                token: refreshToken, // Salva o refresh token atual como revogado
-            }
-        });
-
-        // Gera novos tokens
         const newAccessToken = jwt.sign(
             { userId: decoded.userId, role: decoded.role },
             process.env.JWT_SECRET,
@@ -143,24 +126,21 @@ router.post("/refresh", async (req, res) => {
             { expiresIn: '7d' }
         );
 
-        // Define o novo refresh token como cookie
-        res.setHeader(
-            'Set-Cookie',
-            cookie.serialize('refreshToken', newRefreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // Certifique-se de usar 'https' em produção
-                sameSite: 'strict',
-                maxAge: 60 * 60 * 24 * 7, // 7 dias
-                path: '/',
-            })
-        );
+        // Define o novo refreshToken no cookie
+        res.setHeader('Set-Cookie', cookie.serialize('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 7, // 7 dias
+            path: '/',
+        }));
 
-        // Envia o novo access token
-        res.json({ token: newAccessToken });
-
-    } catch (error) {
-        console.error('Erro ao verificar refresh token:', error);
-        res.status(401).json({ error: 'Refresh token inválido', details: error.message });
+        res.status(200).json({ 
+            token: newAccessToken,  // Envia o novo access token
+        });
+    } catch (err) {
+        console.error('Erro ao verificar refresh token:', err);
+        res.status(401).json({ error: 'Refresh token inválido' });
     }
 });
 

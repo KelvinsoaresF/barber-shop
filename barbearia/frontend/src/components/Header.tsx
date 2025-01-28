@@ -20,37 +20,37 @@ export default function Header({
   const [user, setUser] = useState(null);
   // const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const init = async () => {
-      const refreshToken = localStorage.getItem("refreshToken");
+  // useEffect(() => {
+  //   const init = async () => {
+  //     const refreshToken = localStorage.getItem("refreshToken");
   
-      // if (!refreshToken) {
-      //   setLoading(false); 
-      //   return;
-      // }
+  //     // if (!refreshToken) {
+  //     //   setLoading(false); 
+  //     //   return;
+  //     // }
   
-      try {
+  //     try {
         
-        const response = await api.post(
-          "/auth/refresh",
-          { refreshToken },
-          { withCredentials: true }
-        );
+  //       const response = await api.post(
+  //         "/auth/refresh",
+  //         { refreshToken },
+  //         { withCredentials: true }
+  //       );
   
         
-        localStorage.setItem("accessToken", response.data.token);
-        console.log("Novo accessToken:", response.data.token);
+  //       localStorage.setItem("accessToken", response.data.token);
+  //       console.log("Novo accessToken:", response.data.token);
   
       
-        // setLoading(false);
-      } catch (error) {
-        console.error("Erro ao renovar o access token:", error);
-        // setLoading(false); 
-      }
-    };
+  //       // setLoading(false);
+  //     } catch (error) {
+  //       console.error("Erro ao renovar o access token:", error);
+  //       // setLoading(false); 
+  //     }
+  //   };
   
-    init(); 
-  }, []);
+  //   init(); 
+  // }, []);
 
 
   
@@ -117,7 +117,16 @@ export default function Header({
             <Link href={"/Register"}>
               <Button color="bg-gray-600" text="Registrar" />
             </Link>
+
+          {/* <div className="flex justify-end space-x-7">
+            <Link href={"/CartPage"}>
+              <Button color="bg-gray-600" text="Carrinho" />
+            </Link>
+          </div> */}
           </div>
+
+          
+
         ) : (
           // Exibir usuário logado e logout se estiver logado
           <div className="flex items-center space-x-4">
@@ -134,7 +143,16 @@ export default function Header({
                     {user.role}
                   </p>
                 </div>
+
+                <div className="flex justify-end space-x-7">
+                  <Link href={"/CartPage"}>
+                    <Button color="bg-gray-600" text="Carrinho" />
+                  </Link>
+                </div>
+
               </div>
+
+              
             )}
 
             <Button onClick={handleLogout} color="bg-red-500" text="Logout" />

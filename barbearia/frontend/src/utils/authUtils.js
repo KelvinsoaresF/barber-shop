@@ -1,53 +1,145 @@
+import express from 'express';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import api from './axios';
+import { prisma } from '../models/prismaClient.js';
+import dotenv from 'dotenv';
+import cookie from 'cookie';
+import cors from 'cors';
 
-export const refreshAccessToken = async () => {
-    if (typeof window === 'undefined') {
-        console.warn('Tentativa de usar localStorage no ambiente do servidor');
-        return;
-    }
+dotenv.config();
+const router = express.Router();
 
-    const accessToken = localStorage.getItem('token');
-    if (!accessToken) {
-        console.log("Access token não encontrado. Redirecionando para Login...");
-        // window.location.href = '/Login';
-        return;
-    }
-
-    try {
-        // Não é necessário passar o refresh token diretamente, pois ele será enviado via cookie
-        const response = await api.post('/auth/refresh');
-        console.log("Novo token recebido:", response.data.token);
-
-        // Atualiza o access token no localStorage
-        localStorage.setItem('token', response.data.token); 
-    } catch (err) {
-        console.error('Erro ao atualizar token', err);
-
-        // Caso falhe ao atualizar o token, redireciona para login
-        // window.location.href = '/Login';
-    }
+// Configuração do CORS
+const corsOptions = {
+    origin: 'http://localhost:3000', // Substitua pelo URL correto do seu frontend
+    credentials: true,
 };
+router.use(cors(corsOptions));
 
-export const isTokenExpired = (token) => {
-    if (typeof window === 'undefined') {
-        console.warn('Tentativa de usar jwt.decode no ambiente do servidor');
-        return false;
+// Rota de Registro
+router.post('/register', async (req, res) => {
+    const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: 'Preencha todos os campos obrigatórios.' });
     }
 
     try {
-        const decodedToken = jwt.decode(token);
-        console.log("Token decodificado:", decodedToken);
+        // Verifica se o usuário já existe
+        const existingUser = await prisma.user.findUnique({
+            where: { email },
+        });
 
-        // Verifica se o decodedToken é válido antes de tentar acessar a expiração
-        if (!decodedToken || !decodedToken.exp) {
-            console.error('Token inválido ou sem data de expiração');
-            return false;
+        if (existingUser) {
+            return res.status(400).json({ error: 'E-mail já cadastrado.' });
         }
 
-        return Date.now() / 1000 > decodedToken.exp;
+        // Hash da senha
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Cria o novo usuário no banco de dados
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                role: role || 'cliente', // Define o papel padrão como 'cliente'
+            },
+        });
+
+        res.status(201).json({ message: 'Usuário registrado com sucesso!', userId: newUser.id });
     } catch (error) {
-        console.error("Erro ao decodificar o token:", error);
-        return false;
+        console.error('Erro ao registrar usuário:', error);
+        res.status(500).json({ error: 'Erro interno do servidor ao registrar o usuário.' });
     }
-};
+});
+
+// Rota de Login
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (!user) {
+            return res.status(401).json({ error: 'Usuário não encontrado' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: 'Senha incorreta' });
+        }
+
+        const token = jwt.sign(
+            { userId: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        const refreshToken = jwt.sign(
+            { userId: user.id, role: user.role },
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: '30d' }
+        );
+
+        // Configura o refreshToken no cookie
+        res.setHeader('Set-Cookie', cookie.serialize('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Certifique-se de usar HTTPS em produção
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 30, // 30 dias
+            path: '/',
+        }));
+
+        res.status(200).json({ token, role: user.role });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao realizar login' });
+    }
+});
+
+// Rota para Atualizar o Access Token com o Refresh Token
+router.post('/refresh', (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+        return res.status(401).json({ error: 'Refresh token é necessário' });
+    }
+
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+        const newAccessToken = jwt.sign(
+            { userId: decoded.userId, role: decoded.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        const newRefreshToken = jwt.sign(
+            { userId: decoded.userId, role: decoded.role },
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        // Define o novo refreshToken no cookie
+        res.setHeader('Set-Cookie', cookie.serialize('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 7, // 7 dias
+            path: '/',
+        }));
+
+        res.status(200).json({ 
+            token: newAccessToken,  // Envia o novo access token
+        });
+    } catch (err) {
+        console.error('Erro ao verificar refresh token:', err);
+        res.status(401).json({ error: 'Refresh token inválido' });
+    }
+});
+
+export default router;
+
+

@@ -19,6 +19,7 @@ export const addService = async (req, res) => {
 
         const newService = await prisma.service.create({
             data: { 
+                
                 name, 
                 price: parseFloat(price), 
                 image
