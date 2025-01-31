@@ -144,11 +144,11 @@ export default function Header({
                   </p>
                 </div>
 
-                <div className="flex justify-end space-x-7">
+                {/* <div className="flex justify-end space-x-7">
                   <Link href={"/CartPage"}>
                     <Button color="bg-gray-600" text="Carrinho" />
                   </Link>
-                </div>
+                </div> */}
 
               </div>
 
@@ -159,8 +159,17 @@ export default function Header({
           </div>
         )}
 
+          {isLoged && (
+            <div className="ml-auto">
+              <Link href={"/CartPage"}>
+                <Button color="bg-green-300" text="Carrinho"></Button>
+              </Link>
+            </div>
+          )}
+
           { <div className="flex justify-start space-x-4">{children}</div>}
       </div>
+
 
       <div className="container mx-auto text-center">
         <h1 className="text-4xl font-bold">{title}</h1>

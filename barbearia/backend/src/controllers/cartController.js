@@ -1,7 +1,10 @@
 export const addToCart = async (req, res) => {
+    
     try {
         const { serviceId } = req.body
         const userId = req.user.id
+
+        console.log("Adicionando ao carrinho:", { serviceId, userId });
 
         if (!req.session.cart) {
             req.session.cart = []
@@ -12,7 +15,9 @@ export const addToCart = async (req, res) => {
             return res.status(400).json({ message: 'Serviço ja adicionado no carrinho' })
         }
 
-        req.session.cart.push({ serviceId, userId})
+        req.session.cart.push({ serviceId, userId })
+        console.log("Carrinho atualizado:", req.session.cart);
+
         res.status(201).json({message:'Serviço adicionado ao carrinho', cart: req.session.cart })
     } catch(error) {
         console.error(error)
@@ -22,7 +27,16 @@ export const addToCart = async (req, res) => {
 
 export const getCartItems = async (req, res) => {
     try {
+        console.log("Requisição chegou ao backend!")
+
         const cart = req.session.cart || []
+
+        console.log("Sessão atual:", req.session);
+
+        // Log do conteúdo do carrinho
+        console.log("Carrinho na sessão:", cart);
+
+
         res.status(200).json(cart)
     } catch(error) {
         console.error(error)

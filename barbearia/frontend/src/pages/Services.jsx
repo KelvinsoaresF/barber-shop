@@ -41,8 +41,22 @@ export default function Services() {
 
             if (res.status === 201) {
                 setSuccess('Agendamento realizado com sucesso');
+
+                const addToCartRes = await api.post('/cart/cart', { serviceId }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                
+                if(addToCartRes.status === 201) {
+                    setSuccess('Serviço adicionado ao carrinho')
+                   
+                } else {
+                    setError('Erro ao adicionar ao carrinho')
+                }
             }
+
+
         } catch (error) {
+            console.error('Erro:', error.response?.data)
             if (error.response?.status === 401) {
                 setError('Token expirado. A renovação do token será tentada automaticamente.');
             } else if (error.response?.status === 400) {

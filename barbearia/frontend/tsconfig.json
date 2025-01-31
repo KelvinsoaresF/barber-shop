@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/utils/authUtils.js", "src/utils/axios.js", "src/pages/Services.jsx", "src/components/Header.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/utils/authUtils.js", "src/utils/axios.js", "src/pages/Services.jsx", "src/components/Header.tsx", "src/pages/CartPage.jsx"],
   "exclude": ["node_modules"]
 }

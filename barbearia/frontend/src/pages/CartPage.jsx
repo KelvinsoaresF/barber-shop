@@ -1,5 +1,5 @@
 'use client'
-
+import '@/app/globals.css'
 import { useEffect, useState } from "react"
 import api from "@/utils/axios"
 
@@ -11,13 +11,29 @@ export default function CartPage() {
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const res = await api.get('/cart/cart')
-                setCart(res.data)
+
+                const token = localStorage.getItem("token"); // Pegue o token armazenado
+                if (!token) {
+                    setError("Usuário não autenticado");
+                    return;
+                }
+
+                console.log("Token encontrado:", token);
+
+                const res = await api.get('/cart/cart', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    withCredentials: true
+                })
+                console.log("Carrinho retornado do backend:", res.data); // Adicione este log
+                setCart(Array.isArray(res.data) ? res.data : [])
             } catch(error) {
-                setError('Erro ao carregar carrinho', error)
+                console.error(error)
+                setError('Erro ao carregar carrinho')
             }
         }
-        fetchCart()
+        fetchCart() 
     }, [])
 
     const removeItem = async (serviceId) => {
@@ -39,9 +55,13 @@ export default function CartPage() {
         {success && <p className="text-green-500 mb-4">{success}</p>}
 
         {cart.length === 0 ? (
-            <p className="text-gray-500">Seu carrinho está vazio.</p>
+            <div className='flex justify-center items-center flex-col'>  
+
+                <p className="text-gray-300">Seu carrinho está vazio.</p>
+
+            </div>
         ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-4 bg-white">
                 {cart.map((item) => (
                     <div key={item.serviceId} className="border rounded-lg p-4 shadow-md">
                          <img 
@@ -49,8 +69,10 @@ export default function CartPage() {
                             alt="Imagem do serviço" 
                             className='w-full h-48 object-cover'
                         />
-                        <h2 className="text-lg font-semibold">{item.serviceName}</h2>
-                        <p className="text-gray-700">Preço: R$ {item.price.toFixed(2)}</p>
+                        <h2 className="text-lg font-semibold">{item.name}</h2>
+                        <p className="text-gray-700">Preço: R$ {item.price}</p>
+                        {/* <p className="text-gray-700">{item.status}</p> */}
+                        
                         <button
                             onClick={() => removeItem(item.serviceId)}
                             className="bg-red-500 text-white px-4 py-2 rounded-md mt-2 hover:bg-red-600"

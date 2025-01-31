@@ -3,11 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import session from 'express-session';
+
 import authRoutes from './src/routes/authRoutes.js'; 
 import userRoutes from './src/routes/userRoutes.js'; 
 import serviceRoutes from './src/routes/serviceRoutes.js'; 
 import cartRoutes from './src/routes/cartRoutes.js';
 import appointmentRoutes from './src/routes/appointmentRoutes.js';
+
 import { fileURLToPath } from 'url';
 // import refreshRoutes from './src/routes/refreshRoutes.js';;
 // import upload from './src/middlewares/upload.js';
@@ -27,6 +30,13 @@ app.use(cors({
   origin: 'http://localhost:3000', // URL do frontend
   credentials: true,  // Permite o envio de cookies
 }));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || "uma_chave_muito_segura",
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false },
+}))
   
 
 const __filename = fileURLToPath(import.meta.url);
