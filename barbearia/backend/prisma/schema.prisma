@@ -1,23 +1,14 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
 model appointment {
   id        Int      @id @default(autoincrement())
   userId    Int
   serviceId Int
   date      DateTime
   status    String
-  service   service  @relation(fields: [serviceId], references: [id], map: "Appointment_serviceId_fkey")
-  user      user     @relation(fields: [userId], references: [id], map: "Appointment_userId_fkey")
+  service   service  @relation(fields: [serviceId], references: [id])
+  user      user     @relation(fields: [userId], references: [id])
 
-  @@index([serviceId], map: "Appointment_serviceId_fkey")
-  @@index([userId], map: "Appointment_userId_fkey")
+  @@index([serviceId])
+  @@index([userId])
 }
 
 model service {
@@ -26,16 +17,18 @@ model service {
   price       Float
   image       String?  
   appointment appointment[]
+  cart        cart[]  
 }
 
 model user {
   id          Int           @id @default(autoincrement())
   name        String
-  email       String        @unique(map: "User_email_key")
+  email       String        @unique
   password    String
   role        String
   keyAdm      String?      @default("")
   appointment appointment[]
+  cart        cart[] 
 }
 
 model RevokedTokens {
@@ -43,3 +36,16 @@ model RevokedTokens {
   token        String   @unique
   revokedAt    DateTime @default(now())
 }
+
+model cart {
+  id            Int          @id @default(autoincrement())
+  userId        Int
+  serviceId     Int
+  quantity      Int          @default(1)
+  service       service      @relation(fields: [serviceId], references: [id])
+  user          user         @relation(fields: [userId], references: [id])
+
+  @@index([serviceId])
+  @@index([userId])
+}
+

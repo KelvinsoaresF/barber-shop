@@ -20,7 +20,7 @@ export default function CartPage() {
 
                 console.log("Token encontrado:", token);
 
-                const res = await api.get('/cart/cart', {
+                const res = await api.get('/cart/cartGet', {
                     headers: {
                         Authorization: `Bearer ${token}`
                     },
@@ -38,7 +38,14 @@ export default function CartPage() {
 
     const removeItem = async (serviceId) => {
         try {
-            await api.delete('/cart/cart', { data: { serviceId } })
+            await api.delete(`/cart/cartRemove/${serviceId}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+
+
+
             setCart(cart.filter((item) => item.serviceId !== serviceId))
             setSuccess('Item removido do carrinho')
         } catch (error) {
@@ -69,10 +76,11 @@ export default function CartPage() {
                             alt="Imagem do serviço" 
                             className='w-full h-48 object-cover'
                         />
-                        <h2 className="text-lg font-semibold">{item.name}</h2>
-                        <p className="text-gray-700">Preço: R$ {item.price}</p>
-                        {/* <p className="text-gray-700">{item.status}</p> */}
-                        
+                        <h2 className="text-lg font-semibold">{item.service?.name}</h2>
+                        <p className="text-gray-700">Preço: R$ {item.service?.price}</p>
+                        <p className="text-gray-700">Status: {item.appointment?.date ? new Date(item.appointment.data).toLocaleDateString() : 'Não informado'  }</p>
+                        <p className="text-gray-700">Data: {item.appointment?.status || 'Pendente'}</p>
+                                           
                         <button
                             onClick={() => removeItem(item.serviceId)}
                             className="bg-red-500 text-white px-4 py-2 rounded-md mt-2 hover:bg-red-600"

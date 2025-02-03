@@ -31,13 +31,7 @@ app.use(cors({
   credentials: true,  // Permite o envio de cookies
 }));
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || "uma_chave_muito_segura",
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false },
-}))
-  
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

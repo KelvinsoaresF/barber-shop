@@ -1,3 +1,5 @@
+import { prisma } from "../models/prismaClient.js";
+
 export const addToCart = async (req, res) => {
     
     try {
@@ -6,19 +8,24 @@ export const addToCart = async (req, res) => {
 
         console.log("Adicionando ao carrinho:", { serviceId, userId });
 
-        if (!req.session.cart) {
-            req.session.cart = []
+        const existingItem = await prisma.cart.findFirst({
+            where: { userId, serviceId }
+        })
+
+        if (existingItem) {
+            return res.status(400).json({ message: "Serviço ja adicionado ao carrinho" })
         }
 
-        const isInCart = req.session.cart.find(item => item.serviceId === serviceId)
-        if (isInCart) {
-            return res.status(400).json({ message: 'Serviço ja adicionado no carrinho' })
-        }
+        const newItem = await prisma.cart.create({
+            data: {
+                userId,
+                serviceId,
+                quantity: 1
+            }
+        })
 
-        req.session.cart.push({ serviceId, userId })
-        console.log("Carrinho atualizado:", req.session.cart);
-
-        res.status(201).json({message:'Serviço adicionado ao carrinho', cart: req.session.cart })
+        console.log("Carrinho atualizado:", newItem);
+        res.status(201).json({ message:'Serviço adicionado ao carrinho', cart: newItem })
     } catch(error) {
         console.error(error)
         res.status(500).json({ message: 'Erro ao adicionar serviço ao carrinho' })
@@ -29,13 +36,16 @@ export const getCartItems = async (req, res) => {
     try {
         console.log("Requisição chegou ao backend!")
 
-        const cart = req.session.cart || []
-
-        console.log("Sessão atual:", req.session);
-
-        // Log do conteúdo do carrinho
-        console.log("Carrinho na sessão:", cart);
-
+        const userId = req.user.id
+        const cart = await prisma.cart.findMany({
+            where: { userId },
+            include: {
+                user: true,
+                service: true,
+                // appointment: true
+            }
+        })
+        console.log("Carrinho do usuário:", cart);
 
         res.status(200).json(cart)
     } catch(error) {
@@ -46,14 +56,24 @@ export const getCartItems = async (req, res) => {
 
 export const removeToCart = async (req, res) => {
     try {
-        const { serviceId } = req.body
+        const serviceId = parseInt(req.params.serviceId);  
+        const userId = req.user.id
 
-        if (!req.session.cart) {
-            return res.status(400).json({ message: 'Carrinho vazio' })
+        const cartItem = await prisma.cart.findFirst({
+            where: { userId, serviceId }
+        })
+
+        if (!cartItem) {
+            return res.status(400).json({ message: "Serviço não encontrado" })
         }
 
-        req.session.cart = req.session.cart.filter(items => items.serviceId !== serviceId)
-        res.status(200).json({ message: 'Serviço removido do carrinho', cart: req.session.cart })
+        await prisma.cart.delete({
+            where: { id: cartItem.id }
+        })
+       
+        res.status(200).json({ message: "Serviço removido do carrinho" })
+      
+        
     } catch(error) {
         console.error(error)
         res.status(500).json({ message: 'Erro ao remover serviço do carrinho' })

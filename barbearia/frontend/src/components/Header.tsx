@@ -139,9 +139,7 @@ export default function Header({
                 />
                 <div>
                   <p className="text-sm font-semibold">{user.name}</p>
-                  <p className="text-sm font-semibold text-gray">
-                    {user.role}
-                  </p>
+                  <p className="text-sm font-semibold text-gray">{user.role}</p>
                 </div>
 
                 {/* <div className="flex justify-end space-x-7">

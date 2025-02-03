@@ -6,19 +6,17 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 export default function Services() {
-    const [services, setServices] = useState([])  // Armazenar os serviços carregados
-    const [error, setError] = useState('')  // Mensagem de erro
-    const [success, setSuccess] = useState('')  // Mensagem de sucesso
-    const [token, setToken] = useState(null);  // Token do usuário
-    const router = useRouter()  // Para redirecionar
+    const [services, setServices] = useState([])  
+    const [error, setError] = useState('')  
+    const [success, setSuccess] = useState('') 
+    const [token, setToken] = useState(null);  
+    const router = useRouter()  
 
-    // Lê o token apenas no cliente
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
         setToken(storedToken);
     }, []);
 
-    // Carrega os serviços
     useEffect(() => {
         const fetchServices = async () => {
             try {
@@ -32,7 +30,6 @@ export default function Services() {
         fetchServices();
     }, []);
 
-    // Lida com o registro do agendamento
     const handleRegister = async (serviceId) => {
         try {
             const res = await api.post('/appointment/appointments', { serviceId }, {
@@ -42,7 +39,7 @@ export default function Services() {
             if (res.status === 201) {
                 setSuccess('Agendamento realizado com sucesso');
 
-                const addToCartRes = await api.post('/cart/cart', { serviceId }, {
+                const addToCartRes = await api.post('/cart/cartAdd', { serviceId }, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
                 
@@ -53,7 +50,6 @@ export default function Services() {
                     setError('Erro ao adicionar ao carrinho')
                 }
             }
-
 
         } catch (error) {
             console.error('Erro:', error.response?.data)
@@ -77,6 +73,10 @@ export default function Services() {
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {services.map((service) => (
                     <div key={service.id} className='bg-white p-4 rounded-lg shadow-md'>
+
+                    {error && <p className='text-red-500'>{error}</p>}
+                    {success && <p className='text-green-500'>{success}</p>}
+
                         <img 
                             src={service.image}
                             alt="Imagem do serviço" 
@@ -91,8 +91,6 @@ export default function Services() {
                             className='mt-2 bg-blue-600 text-white px-4 rounded-md'>
                                 Agendar
                         </button>
-                        {error && <p className='text-red-500'>{error}</p>}
-                        {success && <p className='text-green-500'>{success}</p>}
                     </div>
                 ))}
             </div>
