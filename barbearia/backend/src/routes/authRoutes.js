@@ -57,11 +57,14 @@ router.post('/register', async (req, res) => {
 // Rota de Login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-
+    console.log(req.body)
     try {
         const user = await prisma.user.findUnique({
             where: { email },
         });
+        console.log('Usuário encontrado:', user);
+
+       
 
         if (!user) {
             return res.status(401).json({ error: 'Usuário não encontrado' });
@@ -95,6 +98,7 @@ router.post('/login', async (req, res) => {
 
         res.status(200).json({
             token,
+            refreshToken,
             role: user.role,
             message: 'Login realizado com sucesso',
         });

@@ -37,23 +37,6 @@ export const creatAppointment = async (req, res) => {
         });
         console.log("Agendamento criado com sucesso", newAppointment);
 
-        if (!req.session.cart) {
-            req.session.cart = []
-        }
-
-        const isInCart = req.session.cart.find(item => item.serviceId === serviceId);
-        if (!isInCart) {
-            req.session.cart.push({ 
-                serviceId, 
-                userId,
-                name: serviceExists.name, // Usando serviceExists aqui
-                price: serviceExists.price, // Usando serviceExists aqui
-                image: serviceExists.image, // Usando serviceExists aqui
-                // status: serviceExists.status
-            });
-        }
-
-
 
         return res.status(201).json(newAppointment);
     } catch (error) {
@@ -75,6 +58,7 @@ export const getAppointmentByUser = async (req, res) => {
             where: { userId },
             include: {
                 service: true, // Inclui os dados do serviço relacionado
+                user: true, 
             },
         });
 

@@ -1,9 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
 model appointment {
   id        Int      @id @default(autoincrement())
   userId    Int
   serviceId Int
   date      DateTime
   status    String
+  
   service   service  @relation(fields: [serviceId], references: [id])
   user      user     @relation(fields: [userId], references: [id])
 
@@ -16,6 +26,7 @@ model service {
   name        String
   price       Float
   image       String?  
+  
   appointment appointment[]
   cart        cart[]  
 }
@@ -42,10 +53,18 @@ model cart {
   userId        Int
   serviceId     Int
   quantity      Int          @default(1)
+
   service       service      @relation(fields: [serviceId], references: [id])
   user          user         @relation(fields: [userId], references: [id])
 
   @@index([serviceId])
   @@index([userId])
+}
+
+model AvailableSlot {
+  id   Int    @id @default(autoincrement())
+  time String // Exemplo: "14:00"
+  
+  @@unique([time]) // Evita horários duplicados
 }
 

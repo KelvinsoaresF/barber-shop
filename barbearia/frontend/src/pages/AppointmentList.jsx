@@ -11,6 +11,7 @@ export default function AppointmentList() {
         const fetchAppointments = async () => {
             try {
                 const res = await api.get('/appointment/appointments')
+               
                 console.log('Serviços recebidos:', res.data)
                 setAppointments(res.data)
             } catch(error) {

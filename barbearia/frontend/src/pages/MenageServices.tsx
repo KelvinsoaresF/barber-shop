@@ -32,6 +32,10 @@ export default function MenageServices() {
         router.push('/Add-service')
     }
 
+    const handleNewSlot = () => {
+        router.push('/Add-slots')
+    }
+
     return (
         <main className="bg-gray-500 min-h-screen flex flex-col items-center justify-center p-4">
             {/* <h1>Gerenciar serviços</h1> */}
@@ -40,6 +44,12 @@ export default function MenageServices() {
                 className="bg-blue-500 text-white px-4 py-2 rounded-md mb-6 hover:bg-blue-700"            
             >
                 Adicionar serviço
+            </button>
+            <button
+                onClick={handleNewSlot}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md mb-6 hover:bg-blue-700"            
+            >
+                Adicionar Horario
             </button>
 
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>

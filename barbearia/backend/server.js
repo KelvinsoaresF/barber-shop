@@ -10,6 +10,8 @@ import userRoutes from './src/routes/userRoutes.js';
 import serviceRoutes from './src/routes/serviceRoutes.js'; 
 import cartRoutes from './src/routes/cartRoutes.js';
 import appointmentRoutes from './src/routes/appointmentRoutes.js';
+import availableRoutes from './src/routes/availableRoutes.js'
+
 
 import { fileURLToPath } from 'url';
 // import refreshRoutes from './src/routes/refreshRoutes.js';;
@@ -45,6 +47,7 @@ app.use('/api/service',  serviceRoutes)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 app.use('/api/appointment', appointmentRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/available', availableRoutes)
 // app.use('/api/refresh', refreshRoutes)
 
 app.listen(port, () => {

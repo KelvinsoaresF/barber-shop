@@ -39,15 +39,27 @@ export const getCartItems = async (req, res) => {
         const userId = req.user.id
         const cart = await prisma.cart.findMany({
             where: { userId },
-            include: {
-                user: true,
-                service: true,
-                // appointment: true
-            }
+           include: {
+                service: {
+                    include: {
+                        appointment: true
+                    }
+                }
+           }
         })
         console.log("Carrinho do usuário:", cart);
+        console.log("Carrinho do usuário:", JSON.stringify(cart, null, 2));
 
-        res.status(200).json(cart)
+        const formattedCart = cart.map(item => ({
+            serviceId: item.serviceId,
+            name: item.service.name,
+            price: item.service.price,
+            image: item.service.image,
+            status: item.service.appointment?.[0]?.status || "Sem agendamento"  
+          
+        }))
+
+        res.status(200).json(formattedCart)
     } catch(error) {
         console.error(error)
         res.status(500).json({ message: 'Erro ao buscar items no carrinho' })
