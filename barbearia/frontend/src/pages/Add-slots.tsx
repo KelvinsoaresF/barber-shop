@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import api from '@/utils/axios'
+import '@/app/globals.css'
 
 export default function AddSlots() {
 
@@ -18,7 +19,7 @@ export default function AddSlots() {
 
     try {
         const res = await api.get('/available/available')
-        setSlots(res.data)
+        setSlots(Array.isArray(res.data) ? res.data : [])
     } catch(error) {
         console.error('Erro ao carregar horarios', error)
         } 
@@ -56,7 +57,7 @@ export default function AddSlots() {
                     onChange={(e) => setTime(e.target.value)}
                 />
                 <button
-                    className="bg-blue-600"
+                    className="bg-blue-600 rounded-md"
                     onClick={handleAddSlot}
                 >
                     Adicionar horario
@@ -76,7 +77,7 @@ export default function AddSlots() {
                             </li>
                         ))
                     ) : ( 
-                        <p className="text-center text-gray-600">Nenhum horario disponivel</p>
+                        <p className="text-center text-gray-200">Nenhum horario disponivel</p>
                     )}
                 </ul>
         </div>
