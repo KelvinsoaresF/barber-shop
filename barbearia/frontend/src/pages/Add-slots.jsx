@@ -16,36 +16,50 @@ export default function AddSlots() {
     }, [])
 
     const fetchSlots = async() => {
+        try {
+            
+            const res = await api.get('/available/available')
+        
+            if (Array.isArray(res.data)) {
+                setSlots(res.data);
+            } else {
+                console.error("A resposta do backend não é um array:", res.data);
+                setSlots([]); // Evita erro se a resposta for inválida
+            }
 
-    try {
-        const res = await api.get('/available/available')
-        setSlots(Array.isArray(res.data) ? res.data : [])
-    } catch(error) {
-        console.error('Erro ao carregar horarios', error)
-        } 
-    }
+
+        } catch(error) {
+            console.error('Erro ao carregar horarios', error)
+            } 
+        }
 
     const handleAddSlot = async() => {
         if (!time) {
             setError('Digite um horario')
             return
         }
-
+        console.log('Horario enviado', {time})
         try {
-            const res = await api.post('/available/available', { time })
+            const token = localStorage.getItem('token');
+            const res = await api.post('/available/available', { time }, 
+                {
+                    headers: {Authorization: `Bearer ${token}`}
+                }
+            )
             if (res.status === 201) {
                 setSuccess('Horario adicionado')
-                setSlots([...slots, res.data])
+                setSlots([...slots, res.data.slot])
                 setTime("")
             }
         } catch (error) {
             console.error('Erro ao adicionar horario', error)
             setError('Erro ao adicionar horario')
+            
         }
     }
 
     return (
-        <div className="max-w-lg mx-auto p-6">
+        <div className="bg-gray-300 max-w-lg mx-auto p-6">
             <h2 className="text-2xl font-bold text-center mb-6">Adicionar horario</h2>
 
             <div className="flex gap-4 mb-6">

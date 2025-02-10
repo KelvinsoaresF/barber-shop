@@ -9,7 +9,14 @@ export default function Services() {
     const [services, setServices] = useState([])  
     const [error, setError] = useState('')  
     const [success, setSuccess] = useState('') 
-    const [token, setToken] = useState(null);  
+    const [token, setToken] = useState(null);
+    const [selectedService, setSelectedService] = useState(false)
+    const [selecedtDay, setSelectedDay] = useState(null)
+    const [selectedTime, setSelectedTime] = useState(null)
+    const [availableDays, setAvailableDays] = useState([])
+    const [availableTime, setAvailableTimes] = useState([])
+
+
     const router = useRouter()  
 
     useEffect(() => {
@@ -29,6 +36,17 @@ export default function Services() {
         };
         fetchServices();
     }, []);
+
+    const selectService = async(serviceId) => {
+        setSelectedService(serviceId);
+        setSelectedDay(null);
+        setSelectedTime(null);
+        setAvailableTimes([]);
+    }
+
+
+
+
 
     const handleRegister = async (serviceId) => {
         try {
@@ -93,6 +111,9 @@ export default function Services() {
                         </button>
                     </div>
                 ))}
+
+
+
             </div>
         </main>
     );

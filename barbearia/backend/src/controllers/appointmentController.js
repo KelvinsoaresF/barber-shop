@@ -26,11 +26,21 @@ export const creatAppointment = async (req, res) => {
             return res.status(404).json({ message: "Service not found" });
         }
 
+        const appointmentExists = await prisma.appointment.findFirst({
+            where: { time, dayOfWeek }
+        })
+
+        if (appointmentExists) {
+            return res.status(400).json({ message: "Esse horário já foi agendado" });
+        }
+
         // Cria o agendamento
         const newAppointment = await prisma.appointment.create({
             data: {
                 serviceId,
                 userId,
+                time,
+                dayOfWeek,
                 date: new Date(),
                 status: "Pendente",
             },

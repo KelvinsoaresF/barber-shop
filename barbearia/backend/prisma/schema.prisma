@@ -12,6 +12,8 @@ model appointment {
   userId    Int
   serviceId Int
   date      DateTime
+  time      String   // Novo campo para horário
+  dayOfWeek String 
   status    String
   
   service   service  @relation(fields: [serviceId], references: [id])
@@ -63,8 +65,9 @@ model cart {
 
 model AvailableSlot {
   id   Int    @id @default(autoincrement())
+  dayOfWeek String
   time String // Exemplo: "14:00"
   
-  @@unique([time]) // Evita horários duplicados
+  @@unique([dayOfWeek, time]) // Evita horários duplicados
 }
 

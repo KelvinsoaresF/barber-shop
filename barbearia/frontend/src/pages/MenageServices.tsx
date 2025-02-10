@@ -12,7 +12,6 @@ export default function MenageServices() {
     const [showForm, setShowForm] = useState(false)
     const router = useRouter()
     
-   
     useEffect(() => {
         const fetchServices = async () => {
             try {
