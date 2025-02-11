@@ -18,41 +18,6 @@ export default function Header({
   const router = useRouter();
   const [isLoged, setIsLoged] = useState(false);
   const [user, setUser] = useState(null);
-  // const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const init = async () => {
-  //     const refreshToken = localStorage.getItem("refreshToken");
-  
-  //     // if (!refreshToken) {
-  //     //   setLoading(false); 
-  //     //   return;
-  //     // }
-  
-  //     try {
-        
-  //       const response = await api.post(
-  //         "/auth/refresh",
-  //         { refreshToken },
-  //         { withCredentials: true }
-  //       );
-  
-        
-  //       localStorage.setItem("accessToken", response.data.token);
-  //       console.log("Novo accessToken:", response.data.token);
-  
-      
-  //       // setLoading(false);
-  //     } catch (error) {
-  //       console.error("Erro ao renovar o access token:", error);
-  //       // setLoading(false); 
-  //     }
-  //   };
-  
-  //   init(); 
-  // }, []);
-
-
   
   useEffect(() => {
     if (typeof window !== "undefined"){
@@ -63,13 +28,11 @@ export default function Header({
       if (!token) {
         console.error("Token não encontrado");
         setIsLoged(false);
-        // setLoading(false);
         return;
       }
 
       if (token) {
         try {
-          // Faça a requisição para obter os dados do usuário
           const response = await api.get("/users/user", {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -117,12 +80,6 @@ export default function Header({
             <Link href={"/Register"}>
               <Button color="bg-gray-600" text="Registrar" />
             </Link>
-
-          {/* <div className="flex justify-end space-x-7">
-            <Link href={"/CartPage"}>
-              <Button color="bg-gray-600" text="Carrinho" />
-            </Link>
-          </div> */}
           </div>
 
           
@@ -141,13 +98,6 @@ export default function Header({
                   <p className="text-sm font-semibold">{user.name}</p>
                   <p className="text-sm font-semibold text-gray">{user.role}</p>
                 </div>
-
-                {/* <div className="flex justify-end space-x-7">
-                  <Link href={"/CartPage"}>
-                    <Button color="bg-gray-600" text="Carrinho" />
-                  </Link>
-                </div> */}
-
               </div>
 
               

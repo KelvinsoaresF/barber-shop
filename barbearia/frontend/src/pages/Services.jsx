@@ -37,12 +37,16 @@ export default function Services() {
         fetchServices();
     }, []);
 
-    const selectService = async(serviceId) => {
-        setSelectedService(serviceId);
-        setSelectedDay(null);
-        setSelectedTime(null);
-        setAvailableTimes([]);
-    }
+    // const selectService = async(serviceId) => {
+    //     setSelectedService(serviceId);
+    //     setSelectedDay(null);
+    //     setSelectedTime(null);
+    //     setAvailableTimes([]);
+
+    //     try {
+            
+    //     }
+    // }
 
 
 
