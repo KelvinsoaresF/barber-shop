@@ -37,7 +37,7 @@ export default function AddSlots() {
             setError('Digite um horario')
             return
         }
-        console.log('Horario enviado', {time})
+        console.log('Horario enviado', {time, dayOfWeek})
         try {
             const token = localStorage.getItem('token');
             const res = await api.post('/available/available', { time, dayOfWeek }, 
@@ -63,10 +63,18 @@ export default function AddSlots() {
             <div className="flex gap-4 mb-6">
                 <select 
                     className="border p-2 rounded w-full"
+                    value={dayOfWeek}
+                    onChange={(e) => setDayOfWeek(e.target.value)}
                     >
-
-
+                    <option value="">Escolha um horario</option>
+                    <option value="Segunda-feira">Segunda-feira</option>
+                    <option value="Terça-feira">Terça-feira</option>
+                    <option value="Quarta-feira">Quarta-feira</option>
+                    <option value="Quinta-feira">Quinta-feira</option>
+                    <option value="Sexta-feira">Sexta-feira</option>
                 </select>
+
+                
             </div>
 
 
@@ -97,7 +105,7 @@ export default function AddSlots() {
                     {slots.length > 0 ? (
                         slots.map((slot) => (
                             <li key={slot.id} className="p-2 border-b last:border-0">
-                                {slot.time}
+                                {slot.time} - {slot.dayOfWeek}
                             </li>
                         ))
                     ) : ( 
