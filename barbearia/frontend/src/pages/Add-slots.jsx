@@ -7,6 +7,7 @@ import '@/app/globals.css'
 export default function AddSlots() {
 
     const [time, setTime] = useState("")
+    const [dayOfWeek, setDayOfWeek] = useState("")
     const [slots, setSlots] = useState([])
     const [success, setSuccess] = useState('')
     const [error, setError] = useState('')
@@ -19,14 +20,12 @@ export default function AddSlots() {
         try {
             
             const res = await api.get('/available/available')
-        
             if (Array.isArray(res.data)) {
                 setSlots(res.data);
             } else {
                 console.error("A resposta do backend não é um array:", res.data);
                 setSlots([]); // Evita erro se a resposta for inválida
             }
-
 
         } catch(error) {
             console.error('Erro ao carregar horarios', error)
@@ -41,7 +40,7 @@ export default function AddSlots() {
         console.log('Horario enviado', {time})
         try {
             const token = localStorage.getItem('token');
-            const res = await api.post('/available/available', { time }, 
+            const res = await api.post('/available/available', { time, dayOfWeek }, 
                 {
                     headers: {Authorization: `Bearer ${token}`}
                 }
@@ -50,6 +49,7 @@ export default function AddSlots() {
                 setSuccess('Horario adicionado')
                 setSlots([...slots, res.data.slot])
                 setTime("")
+                setDayOfWeek("")
             }
         } catch (error) {
             console.error('Erro ao adicionar horario', error)
@@ -60,6 +60,16 @@ export default function AddSlots() {
 
     return (
         <div className="bg-gray-300 max-w-lg mx-auto p-6">
+            <div className="flex gap-4 mb-6">
+                <select 
+                    className="border p-2 rounded w-full"
+                    >
+
+
+                </select>
+            </div>
+
+
             <h2 className="text-2xl font-bold text-center mb-6">Adicionar horario</h2>
 
             <div className="flex gap-4 mb-6">

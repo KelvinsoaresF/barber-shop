@@ -43,6 +43,6 @@ export const getAvailable = async (req, res) => {
     }
 }
 
-export const getDay = async (req, res) => {
-    const {dayOfWeek} = req.params
-} 
+// export const getDay = async (req, res) => {
+//     const {dayOfWeek} = req.params
+// } 

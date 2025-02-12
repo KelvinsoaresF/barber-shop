@@ -17,6 +17,7 @@ export default function Services() {
     const [availableTime, setAvailableTimes] = useState([])
 
 
+
     const router = useRouter()  
 
     useEffect(() => {
@@ -37,17 +38,25 @@ export default function Services() {
         fetchServices();
     }, []);
 
-    // const selectService = async(serviceId) => {
-    //     setSelectedService(serviceId);
-    //     setSelectedDay(null);
-    //     setSelectedTime(null);
-    //     setAvailableTimes([]);
+    const selectService = async(serviceId) => {
+        setSelectedService(serviceId);
+        setSelectedDay(null);
+        setSelectedTime(null);
+        setAvailableTimes([]);
 
-    //     try {
-            
-    //     }
-    // }
+        try {
+            const res = await api.get('/available')
+            setAvailableDays([...new Set(res.data.map(slot => slot.dayOfWeek))])
+        } catch (error) {
+            console.error(error)
+            setError('Erro ao buscar serviços')
+        }
+    }
 
+    const handleSelectDay = async (dayOfWeek) => {
+        setSelectedDay(dayOfWeek)
+        setSelectedTime(null)
+    }
 
 
 
@@ -115,8 +124,6 @@ export default function Services() {
                         </button>
                     </div>
                 ))}
-
-
 
             </div>
         </main>
