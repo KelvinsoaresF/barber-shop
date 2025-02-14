@@ -66,7 +66,7 @@ export default function AddSlots() {
                     value={dayOfWeek}
                     onChange={(e) => setDayOfWeek(e.target.value)}
                     >
-                    <option value="">Escolha um horario</option>
+                    <option value="">Escolha um dia</option>
                     <option value="Segunda-feira">Segunda-feira</option>
                     <option value="Terça-feira">Terça-feira</option>
                     <option value="Quarta-feira">Quarta-feira</option>
@@ -99,7 +99,7 @@ export default function AddSlots() {
                 {success && <p className="text-green-500 text-center mb-4">{success}</p>}
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-                <h3 className="text-xl font-semibold text-center mb-4">Horarios adicionados</h3>
+                <h3 className="text-xl font-semibold text-center mb-4">Horarios e dias adicionados</h3>
 
                 <ul className="border rounded-lg">
                     {slots.length > 0 ? (
@@ -109,7 +109,7 @@ export default function AddSlots() {
                             </li>
                         ))
                     ) : ( 
-                        <p className="text-center text-gray-200">Nenhum horario disponivel</p>
+                        <p className="text-center text-gray-600">Nenhum horario disponivel</p>
                     )}
                 </ul>
         </div>
