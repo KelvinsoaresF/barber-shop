@@ -1,7 +1,7 @@
 import { prisma } from "../models/prismaClient.js";
 
 export const creatAppointment = async (req, res) => {
-    const { serviceId } = req.body;
+    const { serviceId, time, dayOfWeek } = req.body;
     const userId = req.user?.id; // Obtém o userId do middleware de autenticação
 
     console.log('serviceId:', serviceId);
