@@ -39,15 +39,16 @@ export const getCartItems = async (req, res) => {
         const userId = req.user.id
         const cart = await prisma.cart.findMany({
             where: { userId },
-           include: {
+            include: {
                 service: {
                     include: {
-                        appointment: true
+                        appointment: true, // Isso retorna os agendamentos ligados ao serviço
                     }
                 }
-           }
+            }
         })
         console.log("Carrinho do usuário:", cart);
+       
         console.log("Carrinho do usuário:", JSON.stringify(cart, null, 2));
 
         const formattedCart = cart.map(item => ({
@@ -55,7 +56,9 @@ export const getCartItems = async (req, res) => {
             name: item.service.name,
             price: item.service.price,
             image: item.service.image,
-            status: item.service.appointment?.[0]?.status || "Sem agendamento"  
+            status: item.service.appointment?.[0]?.status || "Sem agendamento",
+            time: item.service.appointment?.[0]?.time || "Sem horário",
+            dayOfWeek: item.service.appointment?.[0]?.dayOfWeek || "Sem data",
           
         }))
 

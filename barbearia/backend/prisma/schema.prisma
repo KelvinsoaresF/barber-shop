@@ -19,6 +19,7 @@ model appointment {
   service   service  @relation(fields: [serviceId], references: [id])
   user      user     @relation(fields: [userId], references: [id])
 
+
   @@index([serviceId])
   @@index([userId])
 }
@@ -28,7 +29,6 @@ model service {
   name        String
   price       Float
   image       String?  
-  
   appointment appointment[]
   cart        cart[]  
 }
@@ -70,4 +70,5 @@ model AvailableSlot {
   
   @@unique([dayOfWeek, time]) // Evita horários duplicados
 }
+
 

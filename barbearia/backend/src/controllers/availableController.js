@@ -31,10 +31,14 @@ export const createAvailable = async (req, res) => {
 export const getAvailable = async (req, res) => {
     const { dayOfWeek } = req.query
 
+    console.log("Requisição recebida:", req.query);
+
     try {
         const slots = await prisma.availableSlot.findMany({
             where: dayOfWeek ? { dayOfWeek } : {}
         })
+        
+        console.log("Slots encontrados:", slots);
 
         res.status(200).json(slots)
     } catch (error) {

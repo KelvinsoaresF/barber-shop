@@ -22,7 +22,7 @@ import { refreshToken } from './src/middlewares/refreshToken.js';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 const jwtSecret = process.env.JWT_SECRET
 
 app.use(cookieParser());

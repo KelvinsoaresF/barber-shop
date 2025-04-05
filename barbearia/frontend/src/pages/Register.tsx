@@ -33,7 +33,7 @@ export default function Register() {
         }
 
         try {
-            const response = await api.post('http://localhost:5000/api/auth/register', {
+            const response = await api.post('/auth/register', {
                 name,
                 email,
                 password,
@@ -58,7 +58,7 @@ export default function Register() {
                     Registro de cliente
                 </h1>
                 {error && <p className="text-red-500 text-center">{error}</p>}
-                {success && <p className="text-red-500 text-center">{success}</p>}
+                {success && <p className="text-green-500 text-center">{success}</p>}
                 <form onSubmit={handleRegister} className="spacex-4">
                     <div>
                         <label 

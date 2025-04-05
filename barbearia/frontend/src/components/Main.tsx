@@ -67,8 +67,8 @@ export default function Main() {
 
     return (
         <>
-        <Header  title="Bem-vindo à Barbearia" 
-         subtitle="Cortes, barbas e mais ao seu dispor">
+        <Header  title="Barber Shop" 
+         subtitle="A mais de 5 anos no mercado!">
          
          </Header>
 
@@ -79,8 +79,7 @@ export default function Main() {
                 <button onClick={handleClick} className=" text-white mt-6 border-2 border-gray-300  rounded-full px-4 py-2">
                     Agende seu serviço
                 </button>
-          
-
+                
             {role === 'admin' && (
                 <>
                     {console.log("Admin detected")}  {/* Verificação para saber se o botão é renderizado */}
@@ -92,7 +91,6 @@ export default function Main() {
                     </button>
                 </>
             )}
-            
             
         </main>
         </>

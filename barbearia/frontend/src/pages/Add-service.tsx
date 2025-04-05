@@ -6,6 +6,7 @@ import api from "@/utils/axios";
 import { useRouter } from 'next/navigation';
 
 export default function AddService() {
+
     const [formData, setFormData] = useState({
         name: '',
         price: 0,
@@ -26,12 +27,12 @@ export default function AddService() {
 
     }
 
-    // handleClick() {
 
-    // }
 
     const handleFile = (e) => {
+
         const file = e.target.files[0]
+
         console.log(file)
         if (file) {
             const imagePreviewURL = URL.createObjectURL(file)
@@ -55,7 +56,7 @@ export default function AddService() {
                 data.append('image', formData.image)
 
 
-            const res = await api.post('http://localhost:5000/api/service/services', data, {
+            const res = await api.post('/service/services', data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
@@ -117,16 +118,12 @@ return (
                     <div className='mt-2 border rounded-md overflow-hidden'>
                         <p className='font-medium mb-2'>Pré visualização</p>
                         <img 
-                        src={previewImage} 
+                        src={previewImage.startsWith('blob') ? previewImage : `http://localhost:5000${previewImage}`} 
                         alt="Imagem do serviço" 
                         className='w-full mt-2 rounded-md bg-gray-300 mt-2' 
                         />
-
                     </div>  
                 )}
-
-                
-                
 
                 <button
                 type='submit'

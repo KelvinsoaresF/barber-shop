@@ -77,6 +77,9 @@ export default function CartPage() {
                             <h2 className="text-gray-600 text-lg font-semibold">{item.name}</h2>
                             <p className="text-gray-700">Preço: R$ {item.price}</p>
                             <p className="text-gray-700">Status: {item.status || "Sem status"}</p>
+                            <p className="text-gray-700">Data: {item.date || "Sem data"}</p>
+                            <p className="text-gray-700">Dia da semana: {item.dayOfWeek || "Sem dia"}</p>
+                            <p className="text-gray-700">Horário: {item.time || "Sem horário"}</p>
                             <button
                                 onClick={() => removeItem(item.serviceId)}
                                 className="bg-red-500 text-white px-4 py-2 rounded-md mt-2 hover:bg-red-600"

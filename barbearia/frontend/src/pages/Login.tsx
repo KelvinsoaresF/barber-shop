@@ -22,7 +22,7 @@ export default function Login() {
 
         try {
             // Envia os dados de email e senha para o servidor
-            const response = await api.post('http://localhost:5000/api/auth/login', {
+            const response = await api.post('/auth/login', {
                 email,
                 password,
             });
@@ -56,7 +56,7 @@ export default function Login() {
                 Login de usuario
             </h1>
             {error && <p className="text-red-500 text-center">{error}</p>}
-            {success && <p className="text-red-500 text-center">{success}</p>}
+            {success && <p className="text-green-500 text-center">{success}</p>}
             <form  onSubmit={handleLogin}className="space-y-4">
                 <div>
                     <label htmlFor="email" className=" text-gray-600  lock text-sm font-medium focus:ring-blue-500 focus:border-blue-500">Email</label>
