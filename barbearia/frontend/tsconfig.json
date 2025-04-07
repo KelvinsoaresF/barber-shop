@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/utils/authUtils.js", "src/utils/axios.js", "src/pages/Services.jsx", "src/components/Header.tsx", "src/pages/CartPage.jsx", "src/pages/AppointmentList.jsx", "src/pages/Add-slots.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/utils/authUtils.js", "src/utils/axios.js", "src/pages/Services.tsx", "src/components/Header.tsx", "src/pages/CartPage.tsx", "src/pages/AppointmentList.tsx", "src/pages/Add-slots.tsx"],
   "exclude": ["node_modules"]
 }
